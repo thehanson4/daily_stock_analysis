@@ -36,6 +36,8 @@ jobs:
     environment: STOCK_LIST
     # 添加超时限制，防止任务卡死
     timeout-minutes: ${{ fromJSON(vars.ANALYSIS_TIMEOUT_MINUTES || '30') }}
+    # <--- 新增下面这一行（缩进与 runs-on 对齐）---
+    if: github.event_name != 'schedule' || vars.SCHEDULE_ENABLED == 'true'
     
     steps:
       - name: 随机延迟（避免固定时间访问）
@@ -277,7 +279,8 @@ jobs:
           LONGBRIDGE_ENABLE_OVERNIGHT: ${{ vars.LONGBRIDGE_ENABLE_OVERNIGHT || secrets.LONGBRIDGE_ENABLE_OVERNIGHT }}
           LONGBRIDGE_PUSH_CANDLESTICK_MODE: ${{ vars.LONGBRIDGE_PUSH_CANDLESTICK_MODE || secrets.LONGBRIDGE_PUSH_CANDLESTICK_MODE }}
           LONGBRIDGE_PRINT_QUOTE_PACKAGES: ${{ vars.LONGBRIDGE_PRINT_QUOTE_PACKAGES || secrets.LONGBRIDGE_PRINT_QUOTE_PACKAGES }}
-          
+           # 新增下面这一行：
+          AKSHARE_PROXY_PATCH_TOKEN: ${{ secrets.AKSHARE_PROXY_PATCH_TOKEN }}
           # ==========================================
           # 搜索服务
           # ==========================================

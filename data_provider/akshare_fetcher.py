@@ -22,6 +22,25 @@ AkshareFetcher - 主数据源 (Priority 1)
 - 实时行情：量比、换手率、市盈率、市净率、总市值、流通市值
 - 筹码分布：获利比例、平均成本、筹码集中度
 """
+import os
+import akshare_proxy_patch
+
+# 配置代理补丁
+# 注意：如果未找到 'AKSHARE_PROXY_PATCH_TOKEN' 环境变量，补丁仍会尝试使用内置代理
+aks_proxy_token = os.getenv("AKSHARE_PROXY_PATCH_TOKEN", "")
+if aks_proxy_token:
+    akshare_proxy_patch.install_patch(
+        "101.201.173.125",                 # 固定代理服务器地址
+        auth_token=aks_proxy_token,        # 从环境变量读取token
+        retry=30,                          # 连接失败时的重试次数
+        hook_domains=[                     # 需要代理的域名列表
+            "https://push2his.eastmoney.com/api/qt/stock/kline/get",   #stock_cyq_em，stock_zh_a_hist
+            "https://push2.eastmoney.com/api/qt/slist/get",            #get_belong_board
+        ],
+    )
+else:
+    # 若未提供token，让补丁直接启用内置代理（不做任何操作）
+    pass
 
 import logging
 import multiprocessing
